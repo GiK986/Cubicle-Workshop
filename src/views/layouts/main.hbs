@@ -9,7 +9,13 @@
 </head>
 
 <body>
-    {{{body}}}
+    <div class="container">
+        {{> main/header }}
+        <main>
+            {{{body}}}
+        </main>
+    </div>
+    {{> main/footer}}
 </body>
 
 </html>
