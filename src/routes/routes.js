@@ -39,4 +39,8 @@ router.get("/details/:id", async (req, res) => {
   res.render("details", { title: "Cube details", ...cube });
 });
 
+router.get("*", (req, res) => {
+  res.render("404");
+});
+
 module.exports = router;
