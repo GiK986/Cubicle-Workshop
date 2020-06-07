@@ -27,7 +27,9 @@ const searchCubes = async (name, difficultyLevelFrom, difficultyLevelTo) => {
   let cubes = await getAll();
 
   if (!!name && cubes.length > 0) {
-    cubes = cubes.filter((cube) => cube.name.includes(name));
+    cubes = cubes.filter((cube) =>
+      cube.name.toLowerCase().includes(name.toLowerCase())
+    );
   }
 
   if (!!difficultyLevelFrom && cubes.length > 0) {
