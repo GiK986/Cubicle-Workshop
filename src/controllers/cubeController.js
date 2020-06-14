@@ -1,48 +1,44 @@
-const fsPromises = require("fs").promises;
-const { databaseFile } = require("../config/config");
+const Cube = require("../models/cube");
 
 const getAll = async () => {
-  const data = await fsPromises.readFile(databaseFile);
-  const result = JSON.parse(data);
+  const cubes = await Cube.find().lean();
 
-  return result;
+  return cubes;
 };
 
-const create = async (newData) => {
-  const cubes = await getAll();
-  cubes.push(newData);
-
-  const data = JSON.stringify(cubes);
-  await fsPromises.writeFile(databaseFile, data);
+const create = async (cubeDoc) => {
+  try {
+    const cubeModel = new Cube(cubeDoc);
+    const cube = await cubeModel.save();
+    return cube;
+  } catch (error) {
+    throw error;
+  }
 };
 
 const getById = async (id) => {
-  const cubes = await getAll();
-  const cube = cubes.find((cube) => cube.id === id);
+  const cube = await Cube.findById(id).lean();
 
   return cube;
 };
 
 const searchCubes = async (name, difficultyLevelFrom, difficultyLevelTo) => {
-  let cubes = await getAll();
+  const query = Cube.find();
 
-  if (!!name && cubes.length > 0) {
-    cubes = cubes.filter((cube) =>
-      cube.name.toLowerCase().includes(name.toLowerCase())
-    );
+  if (!!name) {
+    query.find({ name: new RegExp(name, "i") });
   }
 
-  if (!!difficultyLevelFrom && cubes.length > 0) {
-    cubes = cubes.filter(
-      (cube) => +cube.difficultyLevel >= +difficultyLevelFrom
-    );
+  if (!!difficultyLevelFrom) {
+    query.find({ difficultyLevel: { $gte: difficultyLevelFrom } });
   }
 
-  if (!!difficultyLevelTo && cubes.length > 0) {
-    cubes = cubes.filter((cube) => +cube.difficultyLevel <= +difficultyLevelTo);
+  if (!!difficultyLevelTo) {
+    query.find({ difficultyLevel: { $lte: difficultyLevelTo } });
   }
 
-  return cubes;
+  const result = await query.lean();
+  return result;
 };
 
 module.exports = {
